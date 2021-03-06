@@ -57,3 +57,56 @@ Vehicle::waitOnSystem()
   std::cout << "System ready" << std::endl;
   return;
 }
+
+Vehicle::SetUpAltitudeMonitor()
+{
+  // Set up callback to monitor altitude while the vehicle is in flight
+    Vehicle::telemetry.subscribe_position([](Telemetry::Position position) {
+        std::cout << TELEMETRY_CONSOLE_TEXT // set to blue
+                  << "Altitude: " << position.relative_altitude_m << " m"
+                  << NORMAL_CONSOLE_TEXT // set to default color again
+                  << std::endl;
+    });
+    return;
+}
+
+Vehicle::TakeOff()
+{
+    // Take off
+    std::cout << "Taking off..." << std::endl;
+    const Action::Result takeoff_result = Vehicle::action.takeoff();
+    if (takeoff_result != Action::Result::Success) {
+        std::cout << ERROR_CONSOLE_TEXT << "Takeoff failed:" << takeoff_result
+                  << NORMAL_CONSOLE_TEXT << std::endl;
+        return 1;
+    }
+}
+
+Vehicle::Land()
+{
+    std::cout << "Landing..." << std::endl;
+    const Action::Result land_result = Vehicle::action.land();
+    if (land_result != Action::Result::Success) {
+        std::cout << ERROR_CONSOLE_TEXT << "Land failed:" << land_result << NORMAL_CONSOLE_TEXT
+                  << std::endl;
+        return 1;
+    }
+}
+
+bool Vehicle::isInAir()
+{
+  return Vehicle::telemetry.in_air();
+}
+
+Vehicle::Arm()
+{
+      // Arm vehicle
+    std::cout << "Arming..." << std::endl;
+    const Action::Result arm_result = Vehicle::action.arm();
+
+    if (arm_result != Action::Result::Success) {
+        std::cout << ERROR_CONSOLE_TEXT << "Arming failed:" << arm_result << NORMAL_CONSOLE_TEXT
+                  << std::endl;
+        return 1;
+    }
+}
